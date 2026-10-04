@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchPoint - หาเพื่อนเล่นกีฬา</title>
+<style>
+:root{--navy:#1e3a6e;--blue:#3b6fd4;--green:#2fb36b;--orange:#ff7a2f;--bg:#f5f8ff;--card:#fff;--text:#1f2a44;--muted:#6b7794;--line:#d6deef;--head:#fff}
+body.dark{--bg:#10162a;--card:#1a2340;--text:#e8edfb;--muted:#9aa7c7;--line:#33406a;--head:#1a2340;--navy:#9db8ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:.3s}
+a{text-decoration:none;color:inherit}
+header{position:sticky;top:0;z-index:50;background:var(--head);box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;padding:12px 6%;gap:10px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:1.4rem;color:var(--navy)}
+.logo span{color:var(--orange)}
+.hr{display:flex;gap:8px;align-items:center}
+.btn{display:inline-block;border:none;cursor:pointer;background:var(--orange);color:#fff;padding:10px 22px;border-radius:999px;font-weight:700;font-size:1rem;transition:.2s;font-family:inherit}
+.btn:hover{transform:translateY(-2px)}
+.btn.blue{background:var(--blue)}
+.btn.red{background:#e25563}
+.btn.ghost{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+.btn.sm{padding:6px 14px;font-size:.88rem}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:60px 6%;background:linear-gradient(120deg,#e8eeff 50%,#e6fbef 50%)}
+body.dark .hero{background:linear-gradient(120deg,#18224a 50%,#143328 50%)}
+.hero h1{font-size:2.6rem;color:var(--navy);line-height:1.2}
+.hero p{margin:16px 0 24px;color:var(--muted);font-size:1.1rem}
+.hero .emoji{font-size:6rem;text-align:center;animation:bounce 2s infinite}
+@keyframes bounce{50%{transform:translateY(-14px)}}
+section{padding:46px 6%}
+h2.title{text-align:center;color:var(--navy);font-size:1.9rem;margin-bottom:8px}
+.sub{text-align:center;color:var(--muted);margin-bottom:26px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.card{background:var(--card);border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,58,110,.1)}
+.card .ic{font-size:2.2rem}
+.card h3{margin:8px 0 4px;color:var(--navy)}
+.card p{color:var(--muted);font-size:.95rem}
+.filters{display:flex;flex-wrap:wrap;gap:12px;background:var(--card);padding:18px;border-radius:18px;box-shadow:0 4px 16px rgba(30,58,110,.08);margin-bottom:18px}
+input,select,textarea{padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;font-family:inherit;background:var(--card);color:var(--text)}
+.filters input,.filters select{flex:1;min-width:150px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:8px 16px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);cursor:pointer;font-weight:600}
+.chip.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tabs{display:flex;gap:8px;margin-bottom:16px;justify-content:center}
+.tab{padding:8px 20px;border-radius:999px;cursor:pointer;font-weight:700;background:var(--card);border:1.5px solid var(--line)}
+.tab.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.ev{display:flex;flex-direction:column;gap:6px}
+.ev .top{display:flex;justify-content:space-between;align-items:center}
+.tag{background:#e8eeff;color:var(--blue);padding:2px 12px;border-radius:999px;font-size:.85rem;font-weight:700}
+.tag.full{background:#f9d7da;color:#c0392b}
+.tag.lvl{background:#fff1e6;color:var(--orange)}
+.meta{color:var(--muted);font-size:.93rem}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green)}
+.actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.modal{position:fixed;inset:0;background:rgba(15,25,50,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal.open{display:flex}
+.box{background:var(--card);border-radius:20px;padding:26px;width:100%;max-width:480px;max-height:90vh;overflow:auto}
+.box h3{color:var(--navy);margin-bottom:14px}
+.form{display:flex;flex-direction:column;gap:12px}
+.chat{height:250px;overflow:auto;background:var(--bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.msg{max-width:78%;padding:8px 14px;border-radius:16px;background:var(--card);font-size:.95rem}
+.msg.me{align-self:flex-end;background:var(--blue);color:#fff}
+.msg small{display:block;opacity:.65;font-size:.72rem}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;text-align:center}
+.stats b{display:block;font-size:2.2rem;color:var(--green)}
+.community{background:linear-gradient(120deg,#e6fbef,#e8eeff)}
+body.dark .community{background:linear-gradient(120deg,#143328,#18224a)}
+footer{background:#1e3a6e;color:#cfd8f0;text-align:center;padding:26px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e3a6e;color:#fff;padding:12px 24px;border-radius:999px;opacity:0;transition:.3s;z-index:200;pointer-events:none}
+.toast.show{opacity:1}
+.empty{text-align:center;color:var(--muted);padding:30px}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.hero h1{font-size:2rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#top">Match<span>Point</span> 🏅</a>
+  <div class="hr">
+    <button class="btn ghost sm" onclick="toggleDark()" id="darkBtn">🌙</button>
+    <button class="btn ghost sm" onclick="openProfile()" id="profBtn">👤 โปรไฟล์</button>
+    <button class="btn sm" onclick="openCreate()">+ สร้างกิจกรรม</button>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div>
+    <h1>ไม่มีเพื่อนเล่นกีฬา?<br>MatchPoint ช่วยคุณได้</h1>
+    <p>ค้นหาเพื่อนร่วมทีมตามกีฬา สถานที่ และเวลาที่ว่าง สร้างกิจกรรม ชวนเพื่อน และแชทยืนยันได้ในที่เดียว</p>
+    <a href="#find" class="btn">ค้นหาเพื่อนเล่น</a>
+  </div>
+  <div class="emoji">⚽🏀🎾</div>
+</div>
+
+<section>
+  <h2 class="title">ทำไมต้อง MatchPoint</h2>
+  <p class="sub">แก้ปัญหานักกีฬาที่ไปคนเดียว</p>
+  <div class="grid">
+    <div class="card"><div class="ic">🔍</div><h3>ค้นหาอัจฉริยะ</h3><p>กรองตามกีฬา สถานที่ เวลา และระดับฝีมือ</p></div>
+    <div class="card"><div class="ic">📅</div><h3>จัดการกิจกรรมง่าย</h3><p>สร้างนัด เข้าร่วม ออกจากนัด และแชทยืนยัน</p></div>
+    <div class="card"><div class="ic">🤝</div><h3>ชุมชนนักกีฬา</h3><p>เชื่อมต่อคนรักกีฬาในพื้นที่เดียวกัน</p></div>
+  </div>
+</section>
+
+<section id="find">
+  <h2 class="title">ค้นหากิจกรรม</h2>
+  <p class="sub">เลือกกีฬา สถานที่ และเวลาที่ใช่สำหรับคุณ</p>
+  <div class="tabs">
+    <div class="tab active" id="tabAll" onclick="setTab('all')">ทั้งหมด</div>
+    <div class="tab" id="tabMine" onclick="setTab('mine')">ของฉัน</div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="filters">
+    <input id="fq" placeholder="🔎 ค้นหาชื่อกิจกรรม / สถานที่" oninput="render()">
+    <select id="ftime" onchange="render()">
+      <option value="">ทุกช่วงเวลา</option>
+      <option value="morning">เช้า</option><option value="afternoon">บ่าย</option><option value="evening">เย็น</option>
+    </select>
+    <select id="flevel" onchange="render()">
+      <option value="">ทุกระดับ</option><option>มือใหม่</option><option>ปานกลาง</option><option>เก๋า</option>
+    </select>
+    <select id="fsort" onchange="render()">
+      <option value="date">เรียงตามวันเวลา</option><option value="seat">ที่นั่งว่างมากสุด</option>
+    </select>
+  </div>
+  <div class="grid" id="events"></div>
+</section>
+
+<section class="community">
+  <h2 class="title">ชุมชนนักกีฬา</h2>
+  <p class="sub">ร่วมสร้างสุขภาพดีไปด้วยกัน</p>
+  <div class="stats">
+    <div><b id="s1">0</b>กิจกรรมทั้งหมด</div>
+    <div><b id="s2">0</b>ผู้เข้าร่วม</div>
+    <div><b id="s3">0</b>ชนิดกีฬา</div>
+    <div><b id="s4">0</b>สถานที่</div>
+  </div>
+</section>
+
+<footer>© 2026 MatchPoint – ชวนเพื่อน นัดเพื่อน เล่นกีฬา 🏃</footer>
+
+<div class="modal" id="mProfile" onclick="if(event.target===this)closeM('mProfile')">
+  <div class="box">
+    <h3>โปรไฟล์ของฉัน</h3>
+    <form class="form" onsubmit="saveProfile(event)">
+      <input id="pName" placeholder="ชื่อของคุณ" required>
+      <select id="pLevel"><option>มือใหม่</option><option>ปานกลาง</option><option>เก๋า</option></select>
+      <div class="row"><button class="btn" style="flex:1">บันทึก</button><button type="button" class="btn ghost" onclick="closeM('mProfile')">ปิด</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="mCreate" onclick="if(event.target===this)closeM('mCreate')">
+  <div class="box">
+    <h3>สร้างกิจกรรมใหม่</h3>
+    <form class="form" onsubmit="createEvent(event)">
+      <input id="cTitle" placeholder="ชื่อกิจกรรม" required>
+      <select id="cSport"></select>
+      <select id="cLevel"><option>มือใหม่</option><option selected>ปานกลาง</option><option>เก๋า</option></select>
+      <input id="cPlace" placeholder="สถานที่" required>
+      <input id="cDate" type="date" required>
+      <input id="cTime" type="time" required>
+      <input id="cMax" type="number" min="2" max="50" placeholder="จำนวนผู้เล่น (รวมตัวคุณ)" required>
+      <textarea id="cNote" rows="2" placeholder="รายละเอียดเพิ่มเติม"></textarea>
+      <div class="row"><button class="btn" style="flex:1">สร้าง</button><button type="button" class="btn ghost" onclick="closeM('mCreate')">ยกเลิก</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="mChat" onclick="if(event.target===this)closeM('mChat')">
+  <div class="box">
+    <h3 id="chatTitle">แชท</h3>
+    <div class="chat" id="chatBox"></div>
+    <div class="row" style="margin-bottom:8px">
+      <button class="btn ghost sm" onclick="post('ฉันไปแน่นอน! ✅')">ไปแน่นอน</button>
+      <button class="btn ghost sm" onclick="post('ขอเช็คก่อนนะ 🤔')">ขอเช็คก่อน</button>
+      <button class="btn ghost sm" onclick="post('ขอโทษ ไปไม่ได้ 🙏')">ไปไม่ได้</button>
+    </div>
+    <form class="row" onsubmit="sendMsg(event)" style="flex-wrap:nowrap">
+      <input id="chatIn" placeholder="พิมพ์ข้อความ..." style="flex:1;min-width:0">
+      <button class="btn blue sm">ส่ง</button>
+    </form>
+    <button class="btn ghost sm" style="margin-top:10px" onclick="closeM('mChat')">ปิด</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SPORTS={"⚽ ฟุตบอล":1,"🏀 บาสเกตบอล":1,"🏸 แบดมินตัน":1,"🎾 เทนนิส":1,"🏓 ปิงปอง":1,"🏃 วิ่ง":1,"🏊 ว่ายน้ำ":1,"🚴 ปั่นจักรยาน":1,"🏐 วอลเลย์บอล":1};
+const KEY="matchpoint_events_v2",PKEY="matchpoint_profile";
+const $=id=>document.getElementById(id);
+let sportFilter="",tab="all",currentChat=null;
+let profile=JSON.parse(localStorage.getItem(PKEY)||'{"name":"","level":"ปานกลาง"}');
+let events=JSON.parse(localStorage.getItem(KEY)||"null");
+function dstr(o){const d=new Date();d.setDate(d.getDate()+o);return d.toISOString().slice(0,10)}
+if(!events){
+  events=[
+    {id:1,title:"ตีแบดเย็นนี้ ขาด 2 คน",sport:"🏸 แบดมินตัน",level:"ปานกลาง",place:"สนามแบดศรีนครินทร์",date:dstr(0),time:"18:00",max:4,host:"นุ่น",note:"",players:["นุ่น","เจ","บีม"],chat:[]},
+    {id:2,title:"ฟุตบอล 5 คน สวนสาธารณะ",sport:"⚽ ฟุตบอล",level:"มือใหม่",place:"สวนจตุจักร",date:dstr(1),time:"17:30",max:10,host:"ต้น",note:"เล่นสนุก ไม่เครียด",players:["ต้น","บอล","โอ๊ต","ฟิล์ม"],chat:[]},
+    {id:3,title:"วิ่งเช้า 5 กม.",sport:"🏃 วิ่ง",level:"มือใหม่",place:"สวนลุมพินี",date:dstr(2),time:"06:00",max:8,host:"เมย์",note:"เพซสบายๆ",players:["เมย์","ปอ"],chat:[]},
+    {id:4,title:"บาสครึ่งคอร์ท",sport:"🏀 บาสเกตบอล",level:"เก๋า",place:"สนามบาสพระราม 9",date:dstr(3),time:"16:00",max:6,host:"แบงค์",note:"3on3",players:["แบงค์","เจมส์","ไอซ์"],chat:[]},
+    {id:5,title:"ตีเทนนิสคู่ผสม",sport:"🎾 เทนนิส",level:"ปานกลาง",place:"สนามกีฬาแห่งชาติ",date:dstr(4),time:"09:00",max:4,host:"พลอย",note:"ผู้เริ่มต้นยินดีต้อนรับ",players:["พลอย"],chat:[]}
+  ];save();
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(events))}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function closeM(id){$(id).classList.remove('open')}
+function openM(id){$(id).classList.add('open')}
+function me(){return profile.name}
+function needName(){if(!me()){toast('กรุณาตั้งชื่อในโปรไฟล์ก่อน');openProfile();return true}return false}
+
+function toggleDark(){document.body.classList.toggle('dark');const d=document.body.classList.contains('dark');localStorage.setItem('mp_dark',d?1:0);$('darkBtn').textContent=d?'☀️':'🌙'}
+if(localStorage.getItem('mp_dark')==='1'){document.body.classList.add('dark');$('darkBtn').textContent='☀️'}
+
+function openProfile(){pName.value=profile.name;pLevel.value=profile.level;openM('mProfile')}
+function saveProfile(e){e.preventDefault();profile={name:pName.value.trim(),level:pLevel.value};localStorage.setItem(PKEY,JSON.stringify(profile));updateProf();closeM('mProfile');render();toast('บันทึกโปรไฟล์แล้ว')}
+function updateProf(){profBtn.textContent='👤 '+(me()||'โปรไฟล์')}
+
+function setTab(t){tab=t;tabAll.classList.toggle('active',t==='all');tabMine.classList.toggle('active',t==='mine');render()}
+function renderChips(){
+  chips.innerHTML=`<div class="chip ${sportFilter===''?'active':''}" onclick="setSport('')">ทั้งหมด</div>`+
+  Object.keys(SPORTS).map(s=>`<div class="chip ${sportFilter===s?'active':''}" onclick="setSport('${s}')">${s}</div>`).join('');
+}
+function setSport(s){sportFilter=s;renderChips();render()}
+function slot(t){const h=+t.split(':')[0];return h<12?'morning':h<17?'afternoon':'evening'}
+
+function render(){
+  const q=fq.value.toLowerCase();
+  let list=events.filter(e=>
+    (!sportFilter||e.sport===sportFilter)&&
+    (!q||(e.title+e.place).toLowerCase().includes(q))&&
+    (!ftime.value||slot(e.time)===ftime.value)&&
+    (!flevel.value||e.level===flevel.value)&&
+    (tab==='all'||(me()&&e.players.includes(me())))
+  );
+  list.sort(fsort.value==='seat'?(a,b)=>(b.max-b.players.length)-(a.max-a.players.length):(a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  events_.innerHTML=list.length?list.map(e=>{
+    const left=e.max-e.players.length,pct=Math.round(e.players.length/e.max*100);
+    const joined=me()&&e.players.includes(me()),owner=me()&&e.host===me();
+    return `<div class="card ev">
+      <div class="top"><span class="tag">${e.sport}</span><span class="tag ${left<=0?'full':''}">${left<=0?'เต็มแล้ว':'ขาดอีก '+left+' คน'}</span></div>
+      <h3>${esc(e.title)}</h3>
+      <div class="meta"><span class="tag lvl">${e.level}</span> 📍 ${esc(e.place)}</div>
+      <div class="meta">🗓 ${e.date} · ⏰ ${e.time} น.</div>
+      <div class="meta">👤 โดย ${esc(e.host)} ${e.note?'· '+esc(e.note):''}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="meta">👥 ${e.players.length}/${e.max}: ${e.players.map(esc).join(', ')}</div>
+      <div class="actions">
+        ${joined?(owner?'':`<button class="btn red sm" onclick="leave(${e.id})">ออกจากนัด</button>`):`<button class="btn blue sm" ${left<=0?'disabled style="opacity:.5"':''} onclick="join(${e.id})">เข้าร่วม</button>`}
+        <button class="btn ghost sm" onclick="openChat(${e.id})">💬 ${e.chat.length}</button>
+        <button class="btn ghost sm" onclick="share(${e.id})">ชวนเพื่อน</button>
+        ${owner?`<button class="btn red sm" onclick="del(${e.id})">ลบ</button>`:''}
+      </div></div>`}).join(''):'<div class="empty" style="grid-column:1/-1">ไม่พบกิจกรรม ลองสร้างใหม่ดูสิ! 🎯</div>';
+  stats();
+}
+const events_=document.getElementById('events');
+function stats(){
+  const set=new Set();events.forEach(e=>e.players.forEach(p=>set.add(p)));
+  s1.textContent=events.length;s2.textContent=set.size;
+  s3.textContent=new Set(events.map(e=>e.sport)).size;
+  s4.textContent=new Set(events.map(e=>e.place)).size;
+}
+function openCreate(){
+  if(needName())return;
+  cSport.innerHTML=Object.keys(SPORTS).map(s=>`<option>${s}</option>`).join('');
+  cDate.value=dstr(0);openM('mCreate');
+}
+function createEvent(ev){
+  ev.preventDefault();
+  events.push({id:Date.now(),title:cTitle.value.trim(),sport:cSport.value,level:cLevel.value,place:cPlace.value.trim(),date:cDate.value,time:cTime.value,max:+cMax.value,host:me(),note:cNote.value.trim(),players:[me()],chat:[]});
+  save();closeM('mCreate');ev.target.reset();render();toast('สร้างกิจกรรมสำเร็จ 🎉');
+  $('find').scrollIntoView({behavior:'smooth'});
+}
+function join(id){
+  if(needName())return;
+  const e=events.find(x=>x.id===id);
+  if(e.players.length>=e.max)return toast('กิจกรรมเต็มแล้ว');
+  e.players.push(me());e.chat.push({n:'ระบบ',t:me()+' เข้าร่วมแล้ว ✅'});
+  save();render();toast('เข้าร่วมสำเร็จ!');
+}
+function leave(id){
+  const e=events.find(x=>x.id===id);
+  e.players=e.players.filter(p=>p!==me());e.chat.push({n:'ระบบ',t:me()+' ออกจากกิจกรรม'});
+  save();render();toast('ออกจากกิจกรรมแล้ว');
+}
+function del(id){
+  if(!confirm('ลบกิจกรรมนี้ใช่ไหม?'))return;
+  events=events.filter(x=>x.id!==id);save();render();toast('ลบแล้ว');
+}
+function share(id){
+  const e=events.find(x=>x.id===id);
+  const txt=`ชวนเล่น ${e.sport} "${e.title}" 📍${e.place} 🗓${e.date} ${e.time} น. ขาดอีก ${e.max-e.players.length} คน – MatchPoint`;
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>toast('คัดลอกข้อความชวนเพื่อนแล้ว 📋'))}
+  else prompt('คัดลอกข้อความ:',txt);
+}
+function openChat(id){
+  if(needName())return;
+  currentChat=id;const e=events.find(x=>x.id===id);
+  chatTitle.textContent='💬 '+e.title;drawChat();openM('mChat');
+}
+function drawChat(){
+  const e=events.find(x=>x.id===currentChat);
+  chatBox.innerHTML=e.chat.length?e.chat.map(m=>`<div class="msg ${m.n===me()?'me':''}"><small>${esc(m.n)}</small>${esc(m.t)}</div>`).join(''):'<div class="empty">ยังไม่มีข้อความ เริ่มทักทายเลย 👋</div>';
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+function post(t){events.find(x=>x.id===currentChat).chat.push({n:me(),t});save();drawChat();render()}
+function sendMsg(ev){ev.preventDefault();const t=chatIn.value.trim();if(!t)return;post(t);chatIn.value=''}
+updateProf();renderChips();render();
+</script>
+</body>
+</html>
